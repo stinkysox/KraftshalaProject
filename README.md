@@ -1,7 +1,5 @@
 # React + Vite
 
-# React + Vite
-
 Weather App
 
 Overview
@@ -28,17 +26,17 @@ Install dependencies using npm or yarn:
 
 sql
 Copy code
-npm start
+npm run dev
 
-# or
-
-yarn start
 Open your browser and navigate to http://localhost:3000 to view the Weather App.
 
 Usage
 Enter a city name in the search input field and press Enter or click the Get Details button.
 Weather details including temperature, wind speed, humidity, date, and time will be displayed.
 Use the toggle button to switch between light and dark modes.
+
+Limitaions:
+the date and time details are not working as expected
 
 Technologies Used:
 React
