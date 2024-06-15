@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { ThreeDots } from "react-loader-spinner";
 import "./WeatherApp.css";
 import cloudImage from "../assets/cloud.png";
 import snowImage from "../assets/snow.png";
@@ -11,17 +12,24 @@ import windImage from "../assets/wind.png";
 const WeatherApp = () => {
   const [inputValue, setInputValue] = useState("");
   const [weatherDetails, setWeatherDetails] = useState({
-    humidity: "12 %",
-    wind: "19km/h",
-    temperature: "15 °c",
+    humidity: "12%",
+    wind: "19 km/h",
+    temperature: "15°C",
     location: "Canada",
   });
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [weatherIcon, setWeatherIcon] = useState(snowImage);
+  const [apiStatus, setApiStatus] = useState("");
 
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
   };
+
+  const renderLoadingView = () => (
+    <div className="loader-container">
+      <ThreeDots color="#0b69ff" height="50" width="50" />
+    </div>
+  );
 
   const getWeatherIcon = (iconCode) => {
     switch (iconCode) {
@@ -56,39 +64,40 @@ const WeatherApp = () => {
     const api = `https://api.openweathermap.org/data/2.5/weather?q=${inputValue}&units=metric&APPID=${apiKey}`;
 
     try {
+      setApiStatus("Loading");
       const response = await fetch(api);
-      const data = await response.json();
-      console.log(data);
-
-      const timestampUTC = new Date(data.dt * 1000);
-      console.log(timestampUTC);
-
-      const options = {
-        weekday: "short",
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "numeric",
-        minute: "numeric",
-        second: "numeric",
-        timeZoneName: "short",
-      };
-      const localTime = timestampUTC.toLocaleString("en-US", options);
-      console.log(localTime);
-      setWeatherDetails({
-        humidity: data.main.humidity + "%",
-        wind: Math.floor(data.wind.speed) + " km/h",
-        temperature: Math.floor(data.main.temp) + "°c",
-        location: data.name,
-        dateTime: localTime,
-      });
-
-      const iconCode = data.weather[0].icon;
-      const icon = getWeatherIcon(iconCode);
-      setWeatherIcon(icon);
+      if (response.ok) {
+        const data = await response.json();
+        const timestampUTC = new Date(data.dt * 1000);
+        const options = {
+          weekday: "short",
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+          second: "numeric",
+          timeZoneName: "short",
+        };
+        const localTime = timestampUTC.toLocaleString("en-US", options);
+        setWeatherDetails({
+          humidity: data.main.humidity + "%",
+          wind: Math.floor(data.wind.speed) + " km/h",
+          temperature: Math.floor(data.main.temp) + "°C",
+          location: data.name,
+          dateTime: localTime,
+        });
+        const iconCode = data.weather[0].icon;
+        const icon = getWeatherIcon(iconCode);
+        setWeatherIcon(icon);
+        setApiStatus("Success");
+      } else {
+        setApiStatus("Failed");
+      }
     } catch (error) {
       console.log(error);
-      alert("Please enter a valid name");
+      alert("Please enter a valid city name");
+      setApiStatus("Failed");
     }
   };
 
@@ -96,8 +105,86 @@ const WeatherApp = () => {
     setIsDarkMode(!isDarkMode);
   };
 
+  const renderBasedOnApp = () => {
+    switch (apiStatus) {
+      case "Loading":
+        return renderLoadingView();
+      case "Success":
+        return (
+          <div className="temp-section">
+            <div className="temp-image-container">
+              <img
+                className="weather-image"
+                src={weatherIcon}
+                alt="Weather Icon"
+              />
+            </div>
+            <div className={isDarkMode ? "dark-text" : "temp-text-container"}>
+              <p>{weatherDetails.temperature}</p>
+              <p>{weatherDetails.location}</p>
+              <p>{weatherDetails.dateTime}</p>
+            </div>
+            <div className="wind-humid-container">
+              <div className="humid-container">
+                <p>Humidity: {weatherDetails.humidity}</p>
+                <img
+                  className="small-icon"
+                  src={humidityIcon}
+                  alt="Humidity Icon"
+                />
+              </div>
+              <div className="wind-container">
+                <p>Wind: {weatherDetails.wind}</p>
+                <img className="small-icon" src={windImage} alt="Wind Icon" />
+              </div>
+            </div>
+          </div>
+        );
+      case "Failed":
+        return (
+          <div className="error-text">
+            <p> Failed to fetch weather details. Please try again.</p>
+            <button onClick={() => setApiStatus("")}>Retry</button>
+          </div>
+        );
+      default:
+        return (
+          <div className="temp-section">
+            <div className="temp-image-container">
+              <img
+                className="weather-image"
+                src={weatherIcon}
+                alt="Weather Icon"
+              />
+            </div>
+            <div className={isDarkMode ? "dark-text" : "temp-text-container"}>
+              <p>{weatherDetails.temperature}</p>
+              <p>{weatherDetails.location}</p>
+              <p>{weatherDetails.dateTime}</p>
+            </div>
+            <div className="wind-humid-container">
+              <div className="humid-container">
+                <p>Humidity: </p>
+                <p>{weatherDetails.humidity}</p>
+                <img
+                  className="small-icon"
+                  src={humidityIcon}
+                  alt="Humidity Icon"
+                />
+              </div>
+              <div className="wind-container">
+                <p>Wind: </p>
+                <p>{weatherDetails.wind}</p>
+                <img className="small-icon" src={windImage} alt="Wind Icon" />
+              </div>
+            </div>
+          </div>
+        );
+    }
+  };
+
   return (
-    <div className={isDarkMode ? "dark-bg" : "weather-w-contianer"}>
+    <div className={isDarkMode ? "dark-bg" : "weather-w-contianer "}>
       <div className="weather-app-bg">
         <div className="input-container">
           <input
@@ -111,37 +198,15 @@ const WeatherApp = () => {
             Get Details
           </button>
         </div>
-        <div>
-          <div className="toggle-switch">
-            <button
-              className={isDarkMode ? "black-btn" : "toggle-btn"}
-              onClick={toggleDarkMode}
-            >
-              {isDarkMode ? "Light" : "Dark"}
-            </button>
-          </div>
+        <div className="toggle-switch">
+          <button
+            className={isDarkMode ? "black-btn" : "toggle-btn"}
+            onClick={toggleDarkMode}
+          >
+            {isDarkMode ? "Light" : "Dark"}
+          </button>
         </div>
-
-        <div className="temp-section">
-          <div className="temp-image-container">
-            <img className="weather-image" src={weatherIcon} alt="" />
-          </div>
-          <div className={isDarkMode ? "dark-text" : "temp-text-container"}>
-            <p>{weatherDetails.temperature}</p>
-            <p>{weatherDetails.location}</p>
-            <p>{weatherDetails.dateTime}</p>
-          </div>
-          <div className="wind-humid-container">
-            <div className="humid-container">
-              <p> Humindity: {weatherDetails.humidity}</p>
-              <img className="small-icon" src={humidityIcon} alt="" />
-            </div>
-            <div className="wind-container">
-              <p>Wind: {weatherDetails.wind}</p>
-              <img className="small-icon" src={windImage} alt="" />
-            </div>
-          </div>
-        </div>
+        <div>{renderBasedOnApp()}</div>
       </div>
     </div>
   );

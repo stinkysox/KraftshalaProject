@@ -196,7 +196,7 @@
 
 .dark-text {
   color: beige;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: bold;
   transition: all 1s ease;
 }
@@ -212,7 +212,7 @@
   margin-top: 20px;
   align-items: center;
   color: beige;
-  font-size: 20px;
+  font-size: 18px;
   gap: 20px;
 }
 
@@ -268,22 +268,54 @@
   height: 20px;
 }
 
+.loader-container {
+  height: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.error-text {
+  height: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.error-text button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
 @media (max-width: 600px) {
+  .weather-w-contianer {
+    height: 100vh;
+    overflow-y: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 50px;
+  }
+
+  .dark-bg {
+    height: 100vh;
+    overflow-y: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 50px;
+  }
   .weather-app-bg {
     width: 360px;
     height: 550px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
 
   .temp-text-container {
-    font-size: 20px;
+    font-size: 18px;
   }
 
   .weather-image {
@@ -309,5 +341,10 @@
     align-items: center;
     justify-content: center;
     gap: 12px;
+  }
+
+  .wind-humid-container {
+    font-size: 18px;
+    padding: 10px;
   }
 }
